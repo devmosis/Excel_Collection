@@ -1,0 +1,37 @@
+Attribute VB_Name = "ImportModule"
+'the VB_Name Attribute sets the name of the Module
+'these names should be unique between different modules
+'Subs/Functions should be called using [MODULENAME].[SUB/FUNCTION NAME]
+'the Attribute *MUST* be on Line 1 or this will cause a Critical Error
+
+Option Explicit
+'Option Explicit may be added unexpectedly by the VBA Editor when exporting
+'All variables used within this module should be fully declared
+'Once a variable will no longer be used, the variable should be changed to Empty/Nothing
+
+
+Public Function LastRow(ColumnCell As Range)
+    Dim lrDebug As Boolean: lrDebug = True
+    Dim AWSF As Object: Set AWSF = Application.WorksheetFunction 'Shorthand
+    Dim eColumn As Range: Set eColumn = ColumnCell.EntireColumn 'Entire Column based off passed Range object
+    Dim rCountA As Double: rCountA = AWSF.CountA(eColumn) 'CountA of Column
+    Dim rCountB As Double: rCountB = 0 'CountBlank to the last row
+    Dim rCountC As Double: rCountC = rCountA 'Determines loop length
+    Dim rLoop As Double: rLoop = 0 'Current loop row
+    Dim cCell As Range: Set cCell = eColumn.Cells(1, 1) 'Column Cell used for loop to include blanks
+    While rLoop < rCountC 'Loops to Max Row
+        rLoop = rLoop + 1 'Current Iteration
+        If Len(cCell.Value) < 1 Then 'If cell is blank
+            rCountB = rCountB + 1 'Add to Blank count
+            rCountC = rCountC + 1 'Adds 1 to Max Row
+        End If
+        Set cCell = cCell.Offset(1, 0) 'Loop next cell
+    Wend
+    LastRow = rCountA + rCountB 'Filled + Blank cells
+End Function
+
+Sub TestLastRow()
+    Dim sTime As Double: sTime = Timer
+    Debug.Print LastRow(Selection)
+    Debug.Print Timer - sTime & " Seconds."
+End Sub
